@@ -1,0 +1,6 @@
+.idea
+.idea/
+.idea/*
+.credentials
+*.exe
+.env
