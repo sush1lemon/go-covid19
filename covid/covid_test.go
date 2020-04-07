@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis/v7"
+	"github.com/jezerdave/go-covid19/covid/util"
 	"io/ioutil"
-	"reflect"
 	"strings"
 	"testing"
 )
@@ -29,7 +29,10 @@ type Name struct {
 }
 
 func TestScrape(t *testing.T) {
-	data, err := FetchData()
+
+	srv := NewClient()
+
+	data, err := srv.Worldometer.GetCountriesData()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -56,7 +59,7 @@ func TestScrape(t *testing.T) {
 	for _, v := range *data {
 		for _, c := range result.Countries {
 			if v.Country == c.Name.Official || v.Country == c.Name.Common {
-				key := fmt.Sprintf("countries:%s:ccn3-%s:cca2-%s:cca3-%s", strings.ToLower(c.Name.Common),
+				key := fmt.Sprintf("countries::%s:%s:%s:%s", strings.ToLower(c.Name.Common),
 					strings.ToLower(c.Ccn3), strings.ToLower(c.Cca2), strings.ToLower(c.Cca3))
 				b, err := json.Marshal(v)
 				if err != nil {
@@ -75,7 +78,7 @@ func TestScrape(t *testing.T) {
 	}
 
 	for _, v := range *data {
-		if !InArray(v.Country, test) {
+		if !util.InArray(v.Country, test) {
 			fmt.Println(v.Country)
 		}
 	}
@@ -84,22 +87,26 @@ func TestScrape(t *testing.T) {
 
 }
 
-func InArray(val interface{}, array interface{}) (exists bool) {
-	exists = false
-	//index = -1
+func TestPH(t *testing.T)  {
+	srv := NewClient()
 
-	switch reflect.TypeOf(array).Kind() {
-	case reflect.Slice:
-		s := reflect.ValueOf(array)
+	_, err := srv.Philippines.GetStats()
+	if err != nil {
+		t.Fatal(err)
+	}
+}
 
-		for i := 0; i < s.Len(); i++ {
-			if reflect.DeepEqual(val, s.Index(i).Interface()) == true {
-				//index = i
-				exists = true
-				return
-			}
-		}
+func TestStates(t *testing.T) {
+	srv := NewClient()
+
+	data, err := srv.Worldometer.GetStatesData()
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	return
+	for _, v := range *data {
+		fmt.Println(v)
+	}
+
 }
+

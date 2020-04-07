@@ -1,4 +1,4 @@
-package covid
+package worldometer
 
 import (
 	"math"
@@ -9,6 +9,8 @@ import (
 //Convert Api Country format to country
 func getCountry(t string) string {
 	t = strings.Trim(t, " ")
+	t = strings.TrimSuffix(t, "\n")
+	t = strings.Replace(t, "\n", "", -1)
 	switch t {
 	case "S. Korea":
 		t = "South Korea"

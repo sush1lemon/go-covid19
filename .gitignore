@@ -4,3 +4,4 @@
 .credentials
 *.exe
 .env
+.DS_Store
