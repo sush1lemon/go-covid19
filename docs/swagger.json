@@ -1,0 +1,315 @@
+{
+    "schemes": [
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "REST Api for covid-19 cases",
+        "title": "GO-COVID19 API",
+        "contact": {
+            "name": "Jezer Dave Bacquian",
+            "url": "https://github.com/jezerdave",
+            "email": "jezerdavebacquian@gmail.com"
+        },
+        "license": {},
+        "version": "1.0"
+    },
+    "host": "go-covid19.sideprojects.fun",
+    "basePath": "/api/v1",
+    "paths": {
+        "/countries": {
+            "get": {
+                "description": "get current covid data",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all countries data",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/worldometer.CountryStats"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/countries/{country}": {
+            "get": {
+                "description": "find covid19 related data by country",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Find Country",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "country name / code (philippines/ph/608/phl)",
+                        "name": "country",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/worldometer.CountryStats"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/rest.BasicError"
+                        }
+                    }
+                }
+            }
+        },
+        "/doh/ph": {
+            "get": {
+                "description": "get doh philippines official data from https://ncovtracker.doh.gov.ph/",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "GET DOH PHILIPPINES DATA",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/philippines.StatsAttributes"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/doh/ph/hospital-pui": {
+            "get": {
+                "description": "get doh philippines official data (HOSPITAL PUIs) from https://ncovtracker.doh.gov.ph/",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "GET DOH PHILIPPINES DATA (HOSPITAL PUIs)",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/philippines.HsPUIsAttributes"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/states": {
+            "get": {
+                "description": "get current US-States covid data",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all US-States data",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/worldometer.StatesStats"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/states/{state}": {
+            "get": {
+                "description": "find covid19 related data by state",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Find State",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "State Name / State Abbreviation",
+                        "name": "state",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/worldometer.StatesStats"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/rest.BasicError"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "philippines.HsPUIsAttributes": {
+            "type": "object",
+            "properties": {
+                "ObjectId": {
+                    "type": "integer"
+                },
+                "PUIs": {
+                    "type": "integer"
+                },
+                "hf": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "region": {
+                    "type": "string"
+                }
+            }
+        },
+        "philippines.StatsAttributes": {
+            "type": "object",
+            "properties": {
+                "ObjectId": {
+                    "type": "integer"
+                },
+                "PUIs": {
+                    "type": "object"
+                },
+                "PUMs": {
+                    "type": "object"
+                },
+                "confirmed": {
+                    "type": "integer"
+                },
+                "day": {
+                    "type": "integer"
+                },
+                "deaths": {
+                    "type": "integer"
+                },
+                "recovered": {
+                    "type": "integer"
+                },
+                "tests": {
+                    "type": "object"
+                }
+            }
+        },
+        "rest.BasicError": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "worldometer.CountryStats": {
+            "type": "object",
+            "properties": {
+                "active_cases": {
+                    "type": "integer"
+                },
+                "cases_per_one_million": {
+                    "type": "number"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "country_info": {
+                    "type": "object"
+                },
+                "deaths_per_one_million": {
+                    "type": "number"
+                },
+                "new_cases": {
+                    "type": "integer"
+                },
+                "new_deaths": {
+                    "type": "integer"
+                },
+                "serious_critical": {
+                    "type": "integer"
+                },
+                "tests_per_one_million": {
+                    "type": "number"
+                },
+                "total_cases": {
+                    "type": "integer"
+                },
+                "total_deaths": {
+                    "type": "integer"
+                },
+                "total_recovered": {
+                    "type": "integer"
+                },
+                "total_tests": {
+                    "type": "integer"
+                }
+            }
+        },
+        "worldometer.StatesStats": {
+            "type": "object",
+            "properties": {
+                "active_cases": {
+                    "type": "integer"
+                },
+                "cases_per_one_million": {
+                    "type": "number"
+                },
+                "deaths_per_one_million": {
+                    "type": "number"
+                },
+                "new_cases": {
+                    "type": "integer"
+                },
+                "new_deaths": {
+                    "type": "integer"
+                },
+                "serious_critical": {
+                    "type": "integer"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "state_info": {
+                    "type": "object"
+                },
+                "tests_per_one_million": {
+                    "type": "number"
+                },
+                "total_cases": {
+                    "type": "integer"
+                },
+                "total_deaths": {
+                    "type": "integer"
+                },
+                "total_recovered": {
+                    "type": "integer"
+                },
+                "total_tests": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

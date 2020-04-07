@@ -1,6 +1,6 @@
 # Go-Covid19
 **GO-COVID-19** is just another API 
-######(but written in golang)
+###### (but written in golang)
 
 ## Installation
 #### Package
@@ -23,11 +23,11 @@ data, err := client.Worldometer.GetCountriesData()
 [Philippines](https://github.com/jezerdave/go-covid19/blob/master/covid/philippines/service.go#L15)
 
 ## REST API
-https://go-covid19.herokuapp.com/
-#### DOCS **(WIP)**
+https://go-covid19.sideprojects.fun/api/v1/
+### Documentation
+https://go-covid19.sideprojects.fun/api/v1/docs/index.html
 
-
-##Data Source
+## Data Source
 https://www.worldometers.info/coronavirus/
 https://www.worldometers.info/coronavirus/country/us/
 https://ncovtracker.doh.gov.ph/

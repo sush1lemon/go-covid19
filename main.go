@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"github.com/go-redis/redis/v7"
 	"github.com/jezerdave/go-covid19/covid"
+	_ "github.com/jezerdave/go-covid19/docs"
 	"github.com/jezerdave/go-covid19/src/http/rest"
 	"github.com/jezerdave/go-covid19/src/storage"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"github.com/swaggo/echo-swagger"
 	"io/ioutil"
 	"log"
 	"os"
@@ -24,23 +26,32 @@ var (
 	redisPort = "6379"
 )
 
+// @title GO-COVID19 API
+// @version 1.0
+// @description REST Api for covid-19 cases
+// @BasePath /api/v1
+// @schemes https
+// @host go-covid19.sideprojects.fun
+// @contact.name Jezer Dave Bacquian
+// @contact.url https://github.com/jezerdave
+// @contact.email jezerdavebacquian@gmail.com
+
 func main() {
 
+	getConfig()
 	countries, states, err := getJsons()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	kV := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%s", redisHost, redisPort),
-		Password: redisPass,
-		DB:       0,
-	})
+	kV, err := initRedis(fmt.Sprintf("%s:%s", redisHost, redisPort), redisPass)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.Use(middleware.Gzip())
 	e.Use(middleware.CORS())
 
 	srv := covid.NewClient()
@@ -55,7 +66,6 @@ func main() {
 
 	v := e.Group("api/v1")
 
-
 	cG := v.Group("/countries")
 	cG.GET("", routes.GetCountriesData)
 	cG.GET("/", routes.GetCountriesData)
@@ -64,7 +74,7 @@ func main() {
 	sG := v.Group("/states")
 	sG.GET("", routes.GetStatesData)
 	sG.GET("/", routes.GetStatesData)
-	sG.GET("/:param", routes.FindStates)
+	sG.GET("/:state", routes.FindStates)
 
 	phDoh := v.Group("/doh/ph")
 	phDoh.GET("", routes.GetPHStats)
@@ -72,7 +82,7 @@ func main() {
 	phDoh.GET("/hospital-pui", routes.GetPHHospitalPUIs)
 
 	v.GET("/update", routes.UpdateData)
-
+	v.GET("/docs/*", echoSwagger.WrapHandler)
 
 	go func() {
 		if err := e.Start(fmt.Sprintf(":%s", port)); err != nil {
@@ -91,6 +101,28 @@ func main() {
 	if err := e.Shutdown(ctx); err != nil {
 		e.Logger.Fatal(err)
 	}
+}
+
+func initRedis(addr string, pw string) (*redis.Client, error) {
+
+	fmt.Printf("[REDIS] Connecting at %s \n", addr)
+
+	kV := redis.NewClient(&redis.Options{
+		Addr:     addr,
+		Password: pw,
+		DB:       0,
+	})
+
+	for {
+		_, err := kV.Ping().Result()
+		if err != nil {
+			return nil, err
+		}
+		break
+	}
+
+	log.Printf("[REDIS] Redis Client Connected")
+	return kV, nil
 }
 
 func getJsons() (*rest.CountryList, *rest.States, error) {
@@ -122,8 +154,16 @@ func getJsons() (*rest.CountryList, *rest.States, error) {
 }
 
 func getConfig() {
-	port = os.Getenv("APP_PORT")
-	redisHost = os.Getenv("REDIS_HOST")
-	redisPass = os.Getenv("REDIS_PASS")
-	redisPort = os.Getenv("REDIS_PORT")
+	if os.Getenv("APP_PORT") != "" {
+		port = os.Getenv("APP_PORT")
+	}
+	if os.Getenv("REDIS_HOST") != "" {
+		redisHost = os.Getenv("REDIS_HOST")
+	}
+	if os.Getenv("REDIS_PASS") != "" {
+		redisPass = os.Getenv("REDIS_PASS")
+	}
+	if os.Getenv("REDIS_PORT") != "" {
+		redisPort = os.Getenv("REDIS_PORT")
+	}
 }
