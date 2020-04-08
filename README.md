@@ -18,16 +18,32 @@ client := covid.NewClient()
 data, err := client.Worldometer.GetCountriesData()
 ```
 
-#### Available Packages
+#### Available
 [Worldometer](https://github.com/jezerdave/go-covid19/blob/master/covid/worldometer/service.go#L17) \
-[Philippines](https://github.com/jezerdave/go-covid19/blob/master/covid/philippines/service.go#L15)
+[Philippines](https://github.com/jezerdave/go-covid19/blob/master/covid/philippines/service.go#L15) \
+[WHO](https://github.com/jezerdave/go-covid19/blob/master/covid/who/service.go#12)
 
 ## REST API
+#### LINK
 https://go-covid19.sideprojects.fun/api/v1/
-### Documentation
+#### Documentation
 https://go-covid19.sideprojects.fun/api/v1/docs/index.html
+
+## Run on your machine
+#### Clone repo
+    git clone https://github.com/jezerdave/go-covid19
+#### Run
+    go run .
+### Run with ENV
+    REDIS_HOST=<value> REDIS_PASS=<value> REDIS_PORT=<value> go run .
 
 ## Data Source
 https://www.worldometers.info/coronavirus/
 https://www.worldometers.info/coronavirus/country/us/
-https://ncovtracker.doh.gov.ph/
+https://ncovtracker.doh.gov.ph/ \
+https://who.sprinklr.com/
+
+## API Status
+**Worldometer** - _available_ \
+**WHO** - _available_ \
+**DOH Philippines** - _[not available / maintenance](https://ncovtracker.doh.gov.ph/)_ 

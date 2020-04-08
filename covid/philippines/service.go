@@ -46,7 +46,12 @@ func (s service) GetStats() (*StatsAttributes, error) {
 		return nil, err
 	}
 
-	response := StatsAttributes(baseResponse.Features[0].Attributes)
+	var response StatsAttributes
+
+	if len(baseResponse.Features) > 0 {
+		response = baseResponse.Features[0].Attributes
+	}
+
 	return &response, nil
 }
 

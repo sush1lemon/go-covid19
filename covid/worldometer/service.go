@@ -8,18 +8,18 @@ import (
 	"net/http"
 )
 
-//Service struct
+// Service struct
 type service struct {
 	h http.Client
 }
 
-//Service
+// Service
 type Service interface {
 	GetCountriesData() (*[]CountryStats, error)
 	GetStatesData() (*[]StatesStats, error)
 }
 
-//NewService
+// NewService
 func NewService(h http.Client) Service {
 	return service{h: h}
 }
@@ -95,7 +95,7 @@ func (s service) GetCountriesData() (*[]CountryStats, error) {
 	return &data, nil
 }
 
-//GetStatesData
+// GetStatesData
 func (s service) GetStatesData() (*[]StatesStats, error) {
 	res, err := s.h.Get(statesApi)
 	if err != nil {

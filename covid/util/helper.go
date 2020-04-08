@@ -2,7 +2,7 @@ package util
 
 import "reflect"
 
-//InArray
+// InArray
 func InArray(val interface{}, array interface{}) (exists bool) {
 	exists = false
 	//index = -1
@@ -19,6 +19,5 @@ func InArray(val interface{}, array interface{}) (exists bool) {
 			}
 		}
 	}
-
 	return
 }

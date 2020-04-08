@@ -2,17 +2,17 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis/v7"
 	"github.com/jezerdave/go-covid19/covid"
+	"github.com/jezerdave/go-covid19/covid/util/jsons"
 	_ "github.com/jezerdave/go-covid19/docs"
 	"github.com/jezerdave/go-covid19/src/http/rest"
 	"github.com/jezerdave/go-covid19/src/storage"
+	"github.com/jezerdave/go-covid19/src/updating"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/swaggo/echo-swagger"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/signal"
@@ -35,15 +35,9 @@ var (
 // @contact.name Jezer Dave Bacquian
 // @contact.url https://github.com/jezerdave
 // @contact.email jezerdavebacquian@gmail.com
-
 func main() {
 
 	getConfig()
-	countries, states, err := getJsons()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	kV, err := initRedis(fmt.Sprintf("%s:%s", redisHost, redisPort), redisPass)
 	if err != nil {
 		log.Fatal(err)
@@ -56,12 +50,14 @@ func main() {
 
 	srv := covid.NewClient()
 	repo := storage.NewStorage(kV)
+	countries, _ := jsons.JsonCountries()
+	states, _ := jsons.JsonStates()
+
+	updSrv := updating.NewService(repo, *srv, *countries, *states)
+
 	routes := rest.Handler{
-		PH:          srv.Philippines,
-		WOM:         srv.Worldometer,
-		R:           repo,
-		CountryList: *countries,
-		States:      *states,
+		R:     repo,
+		UpSrv: updSrv,
 	}
 
 	v := e.Group("api/v1")
@@ -78,8 +74,13 @@ func main() {
 
 	phDoh := v.Group("/doh/ph")
 	phDoh.GET("", routes.GetPHStats)
-	phDoh.GET("/", routes.GetPHStats)
+	phDoh.GET("eys", routes.GetPHStats)
 	phDoh.GET("/hospital-pui", routes.GetPHHospitalPUIs)
+
+	hG := v.Group("/histories")
+	hG.GET("", routes.GetHistories)
+	hG.GET("/", routes.GetHistories)
+	hG.GET("/:country", routes.FindCountryHistories)
 
 	v.GET("/update", routes.UpdateData)
 	v.GET("/docs/*", echoSwagger.WrapHandler)
@@ -123,34 +124,6 @@ func initRedis(addr string, pw string) (*redis.Client, error) {
 
 	log.Printf("[REDIS] Redis Client Connected")
 	return kV, nil
-}
-
-func getJsons() (*rest.CountryList, *rest.States, error) {
-
-	var countryList rest.CountryList
-	var stateList rest.States
-
-	clByte, err := ioutil.ReadFile("./src/storage/countries.json")
-	if err != nil {
-		return nil, nil, err
-	}
-
-	err = json.Unmarshal(clByte, &countryList)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	stByte, err := ioutil.ReadFile("./src/storage/states.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = json.Unmarshal(stByte, &stateList)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return &countryList, &stateList, nil
 }
 
 func getConfig() {

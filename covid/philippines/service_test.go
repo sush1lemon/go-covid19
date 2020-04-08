@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-// TEst
+// Test service
 func TestService(t *testing.T) {
 	c := http.Client{
 		Timeout:       30,

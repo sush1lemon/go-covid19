@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-//Convert Api Country format to country
+// Convert Api Country format to country
 func getCountry(t string) string {
 	t = strings.Trim(t, " ")
 	t = strings.TrimSuffix(t, "\n")

@@ -109,6 +109,58 @@
                 }
             }
         },
+        "/histories": {
+            "get": {
+                "description": "get histories",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all countries historical data",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/who.HistoryData"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/histories/{country}": {
+            "get": {
+                "description": "find covid19 related historical data by country",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Find Country Histories",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "country name / code (philippines/ph/608/phl)",
+                        "name": "country",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/who.HistoryData"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/rest.BasicError"
+                        }
+                    }
+                }
+            }
+        },
         "/states": {
             "get": {
                 "description": "get current US-States covid data",
@@ -163,6 +215,44 @@
         }
     },
     "definitions": {
+        "jsons.Country": {
+            "type": "object",
+            "properties": {
+                "cca2": {
+                    "type": "string"
+                },
+                "cca3": {
+                    "type": "string"
+                },
+                "ccn3": {
+                    "type": "string"
+                },
+                "cioc": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "object",
+                    "$ref": "#/definitions/jsons.CountryName"
+                },
+                "tld": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "jsons.CountryName": {
+            "type": "object",
+            "properties": {
+                "common": {
+                    "type": "string"
+                },
+                "official": {
+                    "type": "string"
+                }
+            }
+        },
         "philippines.HsPUIsAttributes": {
             "type": "object",
             "properties": {
@@ -220,6 +310,47 @@
             "properties": {
                 "message": {
                     "type": "string"
+                }
+            }
+        },
+        "who.Data": {
+            "type": "object",
+            "properties": {
+                "case_daily_increase": {
+                    "type": "number"
+                },
+                "date": {
+                    "type": "number"
+                },
+                "death_daily_increase": {
+                    "type": "number"
+                },
+                "region": {
+                    "type": "string"
+                },
+                "total_cases": {
+                    "type": "number"
+                },
+                "total_deaths": {
+                    "type": "number"
+                }
+            }
+        },
+        "who.HistoryData": {
+            "type": "object",
+            "properties": {
+                "country": {
+                    "type": "string"
+                },
+                "country_info": {
+                    "type": "object",
+                    "$ref": "#/definitions/jsons.Country"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/who.Data"
+                    }
                 }
             }
         },

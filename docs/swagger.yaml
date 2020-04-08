@@ -1,5 +1,30 @@
 basePath: /api/v1
 definitions:
+  jsons.Country:
+    properties:
+      cca2:
+        type: string
+      cca3:
+        type: string
+      ccn3:
+        type: string
+      cioc:
+        type: string
+      name:
+        $ref: '#/definitions/jsons.CountryName'
+        type: object
+      tld:
+        items:
+          type: string
+        type: array
+    type: object
+  jsons.CountryName:
+    properties:
+      common:
+        type: string
+      official:
+        type: string
+    type: object
   philippines.HsPUIsAttributes:
     properties:
       ObjectId:
@@ -38,6 +63,33 @@ definitions:
     properties:
       message:
         type: string
+    type: object
+  who.Data:
+    properties:
+      case_daily_increase:
+        type: number
+      date:
+        type: number
+      death_daily_increase:
+        type: number
+      region:
+        type: string
+      total_cases:
+        type: number
+      total_deaths:
+        type: number
+    type: object
+  who.HistoryData:
+    properties:
+      country:
+        type: string
+      country_info:
+        $ref: '#/definitions/jsons.Country'
+        type: object
+      data:
+        items:
+          $ref: '#/definitions/who.Data'
+        type: array
     type: object
   worldometer.CountryStats:
     properties:
@@ -168,6 +220,40 @@ paths:
               $ref: '#/definitions/philippines.HsPUIsAttributes'
             type: array
       summary: GET DOH PHILIPPINES DATA (HOSPITAL PUIs)
+  /histories:
+    get:
+      description: get histories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/who.HistoryData'
+            type: array
+      summary: Get all countries historical data
+  /histories/{country}:
+    get:
+      description: find covid19 related historical data by country
+      parameters:
+      - description: country name / code (philippines/ph/608/phl)
+        in: path
+        name: country
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/who.HistoryData'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/rest.BasicError'
+      summary: Find Country Histories
   /states:
     get:
       description: get current US-States covid data
