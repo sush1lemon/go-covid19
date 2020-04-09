@@ -14,7 +14,7 @@ import (
 
 // Handler
 type Handler struct {
-	R   storage.Storage
+	R     storage.Storage
 	UpSrv updating.Service
 }
 
@@ -34,8 +34,10 @@ func (h Handler) GetCountriesData(c echo.Context) error {
 	var response []worldometer.CountryStats
 	for _, v := range *raw {
 		var holder worldometer.CountryStats
-		json.Unmarshal([]byte(v), &holder)
-		response = append(response, holder)
+		err := json.Unmarshal([]byte(v), &holder)
+		if err == nil {
+			response = append(response, holder)
+		}
 	}
 
 	return c.JSON(200, &response)
@@ -56,8 +58,10 @@ func (h Handler) GetStatesData(c echo.Context) error {
 	var response []worldometer.StatesStats
 	for _, v := range *raw {
 		var holder worldometer.StatesStats
-		json.Unmarshal([]byte(v), &holder)
-		response = append(response, holder)
+		err := json.Unmarshal([]byte(v), &holder)
+		if err == nil {
+			response = append(response, holder)
+		}
 	}
 
 	return c.JSON(200, &response)
@@ -84,7 +88,10 @@ func (h Handler) FindCountry(c echo.Context) error {
 	}
 
 	for _, v := range *raw {
-		json.Unmarshal([]byte(v), &response)
+		err := json.Unmarshal([]byte(v), &response)
+		if err != nil {
+			return err
+		}
 	}
 
 	if response.CountryInfo == nil {
@@ -112,7 +119,7 @@ func (h Handler) FindStates(c echo.Context) error {
 
 	raw, err := h.R.Find(fmt.Sprintf("*us-state:*:%s:*", parameter))
 	if err != nil {
-		return  c.JSON(404, basicErr)
+		return c.JSON(404, basicErr)
 	}
 
 	for _, v := range *raw {
@@ -120,7 +127,7 @@ func (h Handler) FindStates(c echo.Context) error {
 	}
 
 	if response.StateInfo == nil {
-		return  c.JSON(404, basicErr)
+		return c.JSON(404, basicErr)
 	}
 
 	return c.JSON(200, response)
@@ -184,7 +191,7 @@ func (h Handler) GetPHHospitalPUIs(c echo.Context) error {
 	return c.JSON(200, response)
 }
 
-// GetHistories godoc
+//GetHistories
 // @Summary Get all countries historical data
 // @Description get histories
 // @Produce  json
@@ -199,14 +206,16 @@ func (h Handler) GetHistories(c echo.Context) error {
 	var response []who.HistoryData
 	for _, v := range *raw {
 		var holder who.HistoryData
-		json.Unmarshal([]byte(v), &holder)
-		response = append(response, holder)
+		err := json.Unmarshal([]byte(v), &holder)
+		if err == nil{
+			response = append(response, holder)
+		}
 	}
 
 	return c.JSON(200, &response)
 }
 
-// FindCountry
+//FindCountryHistories
 // @Summary Find Country Histories
 // @Description find covid19 related historical data by country
 // @Produce  json

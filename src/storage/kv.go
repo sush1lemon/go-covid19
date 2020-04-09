@@ -59,7 +59,7 @@ func (s storage) GetAll(param string) (*[]string, error) {
 	return &result, nil
 }
 
-// Get
+//Get
 func (s storage) Get(param string) (*string, error) {
 	data, err := s.kV.Get(param).Result()
 	if err != nil {
@@ -68,7 +68,7 @@ func (s storage) Get(param string) (*string, error) {
 	return &data, nil
 }
 
-// Storage
+//Storage
 type Storage interface {
 	Find(key string) (*[]string, error)
 	GetAll(param string) (*[]string, error)
@@ -76,7 +76,7 @@ type Storage interface {
 	Get(param string) (*string, error)
 }
 
-// NewStorage
-func NewStorage(kv *redis.Client) Storage  {
-	return &storage{kV:kv}
+//NewStorage
+func NewStorage(kv *redis.Client) Storage {
+	return &storage{kV: kv}
 }

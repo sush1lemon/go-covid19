@@ -85,6 +85,17 @@ func main() {
 	v.GET("/update", routes.UpdateData)
 	v.GET("/docs/*", echoSwagger.WrapHandler)
 
+	uptimeTicker := time.NewTicker(1 * time.Hour)
+	go func() {
+		for {
+			select {
+			case <-uptimeTicker.C:
+				fmt.Println("UPDATING DATA")
+				go updSrv.UpdateData()
+			}
+		}
+	}()
+
 	go func() {
 		if err := e.Start(fmt.Sprintf(":%s", port)); err != nil {
 			e.Logger.Info("shutting down the server")

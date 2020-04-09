@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+//service
 type service struct {
 	h http.Client
 }

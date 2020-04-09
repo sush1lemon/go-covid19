@@ -1,7 +1,6 @@
 package worldometer
 
 import (
-	"errors"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/jezerdave/go-covid19/covid/util"
@@ -13,18 +12,18 @@ type service struct {
 	h http.Client
 }
 
-// Service
+//Service
 type Service interface {
 	GetCountriesData() (*[]CountryStats, error)
 	GetStatesData() (*[]StatesStats, error)
 }
 
-// NewService
+//NewService
 func NewService(h http.Client) Service {
 	return service{h: h}
 }
 
-// Fetch data from api
+//GetCountriesData
 func (s service) GetCountriesData() (*[]CountryStats, error) {
 
 	res, err := s.h.Get(countriesApi)
@@ -34,7 +33,7 @@ func (s service) GetCountriesData() (*[]CountryStats, error) {
 
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		return nil, errors.New(fmt.Sprintf("status code error: %d %s", res.StatusCode, res.Status))
+		return nil, fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
 	}
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
@@ -51,40 +50,28 @@ func (s service) GetCountriesData() (*[]CountryStats, error) {
 			switch itd {
 			case 0:
 				holder.Country = getCountry(sTD.Text())
-				break
 			case 1:
 				holder.TotalCases = formatToInt(sTD.Text())
-				break
 			case 2:
 				holder.NewCases = formatToInt(sTD.Text())
-				break
 			case 3:
 				holder.TotalDeaths = formatToInt(sTD.Text())
-				break
 			case 4:
 				holder.NewDeaths = formatToInt(sTD.Text())
-				break
 			case 5:
 				holder.TotalRecovered = formatToInt(sTD.Text())
-				break
 			case 6:
 				holder.ActiveCases = formatToInt(sTD.Text())
-				break
 			case 7:
 				holder.SeriousCritical = formatToInt(sTD.Text())
-				break
 			case 8:
 				holder.CasesPerOneMillion = formatToFloat(sTD.Text())
-				break
 			case 9:
 				holder.DeathsPerOneMillion = formatToFloat(sTD.Text())
-				break
 			case 10:
 				holder.TotalTests = formatToInt(sTD.Text())
-				break
 			case 11:
 				holder.TestsPerOneMillion = formatToFloat(sTD.Text())
-				break
 			}
 		})
 		if holder.Country != "" {
@@ -95,7 +82,7 @@ func (s service) GetCountriesData() (*[]CountryStats, error) {
 	return &data, nil
 }
 
-// GetStatesData
+//GetStatesData
 func (s service) GetStatesData() (*[]StatesStats, error) {
 	res, err := s.h.Get(statesApi)
 	if err != nil {
@@ -104,7 +91,7 @@ func (s service) GetStatesData() (*[]StatesStats, error) {
 
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		return nil, errors.New(fmt.Sprintf("status code error: %d %s", res.StatusCode, res.Status))
+		return nil, fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
 	}
 
 	doc, err := goquery.NewDocumentFromReader(res.Body)
@@ -122,40 +109,28 @@ func (s service) GetStatesData() (*[]StatesStats, error) {
 			switch itd {
 			case 0:
 				holder.State = getCountry(sTD.Text())
-				break
 			case 1:
 				holder.TotalCases = formatToInt(sTD.Text())
-				break
 			case 2:
 				holder.NewCases = formatToInt(sTD.Text())
-				break
 			case 3:
 				holder.TotalDeaths = formatToInt(sTD.Text())
-				break
 			case 4:
 				holder.NewDeaths = formatToInt(sTD.Text())
-				break
 			case 5:
 				holder.TotalRecovered = formatToInt(sTD.Text())
-				break
 			case 6:
 				holder.ActiveCases = formatToInt(sTD.Text())
-				break
 			case 7:
 				holder.SeriousCritical = formatToInt(sTD.Text())
-				break
 			case 8:
 				holder.CasesPerOneMillion = formatToFloat(sTD.Text())
-				break
 			case 9:
 				holder.DeathsPerOneMillion = formatToFloat(sTD.Text())
-				break
 			case 10:
 				holder.TotalTests = formatToInt(sTD.Text())
-				break
 			case 11:
 				holder.TestsPerOneMillion = formatToFloat(sTD.Text())
-				break
 			}
 		})
 		if holder.State != "" && !util.InArray(holder.State, exception) {

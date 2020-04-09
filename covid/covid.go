@@ -9,14 +9,14 @@ import (
 	"time"
 )
 
-// Client
+//Client
 type Client struct {
 	Philippines philippines.Service
 	Worldometer worldometer.Service
 	WHO         who.Service
 }
 
-// NewClient
+//NewClient
 func NewClient() *Client {
 
 	list, _ := jsons.JsonCountries()

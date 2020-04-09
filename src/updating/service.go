@@ -11,6 +11,7 @@ import (
 	"strings"
 	"sync"
 )
+
 // service
 type service struct {
 	repo      storage.Storage
@@ -19,7 +20,7 @@ type service struct {
 	states    jsons.States
 }
 
-// UpdateData
+//UpdateData
 func (s service) UpdateData() (interface{}, error) {
 
 	var countries *[]worldometer.CountryStats
@@ -72,7 +73,7 @@ func (s service) UpdateData() (interface{}, error) {
 				key := fmt.Sprintf("country::%s:%s:%s:%s:", strings.ToLower(c.Name.Common),
 					strings.ToLower(c.Ccn3), strings.ToLower(c.Cca2), strings.ToLower(c.Cca3))
 				v.CountryInfo = c
-				s.repo.New(key, v)
+				go s.repo.New(key, v)
 			}
 		}
 
@@ -86,7 +87,7 @@ func (s service) UpdateData() (interface{}, error) {
 				info["name"] = st
 				info["abbreviation"] = i
 				v.StateInfo = info
-				s.repo.New(key, v)
+				go s.repo.New(key, v)
 			}
 		}
 	}
@@ -94,7 +95,7 @@ func (s service) UpdateData() (interface{}, error) {
 	for _, v := range *history {
 		key := fmt.Sprintf("history::%s:%s:%s:%s:", strings.ToLower(v.CountryInfo.Name.Common),
 			strings.ToLower(v.CountryInfo.Ccn3), strings.ToLower(v.CountryInfo.Cca2), strings.ToLower(v.CountryInfo.Cca3))
-		s.repo.New(key, v)
+		go s.repo.New(key, v)
 	}
 
 	response := make(map[string]interface{})
@@ -105,16 +106,15 @@ func (s service) UpdateData() (interface{}, error) {
 	response["doh_ph_hospital_pui"] = phhspui
 	response["who_history"] = history
 
-
 	return response, nil
 }
 
-// Service
+//Service
 type Service interface {
 	UpdateData() (interface{}, error)
 }
 
-// Create new service
+//NewService
 func NewService(repo storage.Storage, api covid.Client, list jsons.CountryList, states jsons.States) Service {
 	return service{
 		repo:      repo,

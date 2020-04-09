@@ -47,7 +47,7 @@ func (s service) History() (*[]HistoryData, error) {
 			source = &sHold
 		}
 
-		if cAbv != lastAbv && i != 0{
+		if cAbv != lastAbv && i != 0 {
 			hs.Country = lastAbv
 			response = append(response, hs)
 			hs = HistoryData{}
@@ -66,12 +66,11 @@ func (s service) History() (*[]HistoryData, error) {
 		lastAbv = cAbv
 	}
 
-
 	var res []HistoryData
 
 	for _, v := range response {
 		for _, x := range s.cList.Countries {
-			if strings.ToLower(x.Cca2) == strings.ToLower(v.Country) || strings.ToLower(x.Cca3) == strings.ToLower(v.Country) {
+			if strings.EqualFold(x.Cca2, v.Country) || strings.EqualFold(x.Cca3, v.Country) {
 				v.Country = x.Name.Common
 				v.CountryInfo = x
 				res = append(res, v)

@@ -1,6 +1,6 @@
 package rest
 
-// BasicError
+//BasicError
 type BasicError struct {
 	Message string `json:"message"`
 }

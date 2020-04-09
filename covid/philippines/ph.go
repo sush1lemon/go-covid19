@@ -5,35 +5,35 @@ const currentStats = "slide_fig/FeatureServer/0/query?"
 const hospitalPUI = "PUI_fac_tracing/FeatureServer/0/query?"
 const ageGroup = "age_group/FeatureServer/0/query?"
 
-// Params
+//phParams
 type phParams struct {
 	F              string `json:"f" url:"f"`
 	Where          string `json:"where" url:"where"`
 	ReturnGeometry string `json:"returnGeometry" url:"returnGeometry"`
 	SpatialRel     string `json:"spatialRel" url:"spatialRel"`
 	OutFields      string `json:"outFields" url:"outFields"`
-	OutStatistics  string `json:"outStatistics, omitempty" url:"outStatistics, omitempty"`
+	OutStatistics  string `json:"outStatistics,omitempty" url:"outStatistics,omitempty"`
 	CacheHint      string `json:"cacheHint" url:"cacheHint"`
 }
 
 // Params
-type outStatistics struct {
-	StatisticType         string `json:"statisticType" url:"statisticType"`
-	OnStatisticField      string `json:"onStatisticField" url:"onStatisticField"`
-	OutStatisticFieldName string `json:"outStatisticFieldName" url:"outStatisticFieldName"`
-}
+//type outStatistics struct {
+//	StatisticType         string `json:"statisticType" url:"statisticType"`
+//	OnStatisticField      string `json:"onStatisticField" url:"onStatisticField"`
+//	OutStatisticFieldName string `json:"outStatisticFieldName" url:"outStatisticFieldName"`
+//}
 
-// Api response
+//statsBase response
 type statsBase struct {
 	Features []statsFeature `json:"features"`
 }
 
-// Api response
+//statsFeature
 type statsFeature struct {
 	Attributes StatsAttributes `json:"attributes"`
 }
 
-// Api response
+//StatsAttributes
 type StatsAttributes struct {
 	Day       int64       `json:"day"`
 	Confirmed int64       `json:"confirmed"`
@@ -45,17 +45,17 @@ type StatsAttributes struct {
 	ObjectID  int64       `json:"ObjectId"`
 }
 
-// Api response
+//hsPUIBase
 type hsPUIBase struct {
 	Features []hsPUIFeature `json:"features"`
 }
 
-// Api response
+//hsPUIFeature
 type hsPUIFeature struct {
 	Attributes HsPUIsAttributes `json:"attributes"`
 }
 
-// Api response
+//HsPUIsAttributes
 type HsPUIsAttributes struct {
 	Region    string  `json:"region"`
 	HF        string  `json:"hf"`
