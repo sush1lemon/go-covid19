@@ -3,9 +3,10 @@ package philippines
 const baseApi = "https://services5.arcgis.com/mnYJ21GiFTR97WFg/arcgis/rest/services/"
 const currentStats = "slide_fig/FeatureServer/0/query?"
 const hospitalPUI = "PUI_fac_tracing/FeatureServer/0/query?"
-const ageGroup = "age_group/FeatureServer/0/query?"
 
-//phParams
+//const ageGroup = "age_group/FeatureServer/0/query?"
+
+//phParams struct
 type phParams struct {
 	F              string `json:"f" url:"f"`
 	Where          string `json:"where" url:"where"`
@@ -33,7 +34,7 @@ type statsFeature struct {
 	Attributes StatsAttributes `json:"attributes"`
 }
 
-//StatsAttributes
+//StatsAttributes ph data
 type StatsAttributes struct {
 	Day       int64       `json:"day"`
 	Confirmed int64       `json:"confirmed"`
@@ -55,7 +56,7 @@ type hsPUIFeature struct {
 	Attributes HsPUIsAttributes `json:"attributes"`
 }
 
-//HsPUIsAttributes
+//HsPUIsAttributes hospital puis data
 type HsPUIsAttributes struct {
 	Region    string  `json:"region"`
 	HF        string  `json:"hf"`

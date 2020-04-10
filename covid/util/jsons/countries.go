@@ -3290,12 +3290,12 @@ const countries = `{
   ]
 }`
 
-//CountryList
+//CountryList struct
 type CountryList struct {
 	Countries []Country `json:"countries"`
 }
 
-//Country
+//Country struct
 type Country struct {
 	Name CountryName `json:"name"`
 	TLD  []string    `json:"tld"`
@@ -3305,13 +3305,13 @@ type Country struct {
 	Cioc string      `json:"cioc"`
 }
 
-//CountryName
+//CountryName struct
 type CountryName struct {
 	Common   string `json:"common"`
 	Official string `json:"official"`
 }
 
-//JsonCountries
+//JsonCountries list of countries
 func JsonCountries() (*CountryList, error) {
 	var countryList CountryList
 	err := json.Unmarshal([]byte(countries), &countryList)

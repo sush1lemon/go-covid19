@@ -1,4 +1,4 @@
-# Go-Covid19
+# Go-Covid19 [![Go Report Card](https://goreportcard.com/badge/github.com/jezerdave/go-covid19)](https://goreportcard.com/report/github.com/jezerdave/go-covid19)
 **go-covid19** is a Go Package / Rest API for getting covid19 related data from different source
 
 

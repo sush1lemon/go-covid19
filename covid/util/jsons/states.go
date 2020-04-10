@@ -67,12 +67,12 @@ const states = `{
     }
 }`
 
-//States
+//States struct
 type States struct {
 	States map[string]string `json:"states"`
 }
 
-//JsonStates
+//JsonStates get states list
 func JsonStates() (*States, error) {
 	var state States
 	err := json.Unmarshal([]byte(states), &state)

@@ -20,7 +20,7 @@ type service struct {
 	states    jsons.States
 }
 
-//UpdateData
+//UpdateData get data from api and save to redis
 func (s service) UpdateData() (interface{}, error) {
 
 	var countries *[]worldometer.CountryStats
@@ -56,40 +56,30 @@ func (s service) UpdateData() (interface{}, error) {
 	wg.Wait()
 
 	pSK := "doh-philippines-latest"
-	err := s.repo.New(pSK, phStats)
-	if err != nil {
-		return nil, err
+	if phStats != nil {
+		err := s.repo.New(pSK, phStats)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	pHK := "doh-philippines-hospitalpui-latest"
-	err = s.repo.New(pHK, phhspui)
-	if err != nil {
-		return nil, err
+	if phhspui != nil {
+		err := s.repo.New(pHK, phhspui)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	for _, v := range *countries {
-		for _, c := range s.countries.Countries {
-			if v.Country == c.Name.Official || v.Country == c.Name.Common {
-				key := fmt.Sprintf("country::%s:%s:%s:%s:", strings.ToLower(c.Name.Common),
-					strings.ToLower(c.Ccn3), strings.ToLower(c.Cca2), strings.ToLower(c.Cca3))
-				v.CountryInfo = c
-				go s.repo.New(key, v)
-			}
-		}
-
+		key := fmt.Sprintf("country::%s:%s:%s:%s:", strings.ToLower(v.CountryInfo.Name.Common),
+			strings.ToLower(v.CountryInfo.Ccn3), strings.ToLower(v.CountryInfo.Cca2), strings.ToLower(v.CountryInfo.Cca3))
+		go s.repo.New(key, v)
 	}
 
 	for _, v := range *states {
-		for i, st := range s.states.States {
-			if v.State == st {
-				key := fmt.Sprintf("us-state::%s:%s:", strings.ToLower(v.State), strings.ToLower(i))
-				info := make(map[string]interface{})
-				info["name"] = st
-				info["abbreviation"] = i
-				v.StateInfo = info
-				go s.repo.New(key, v)
-			}
-		}
+		key := fmt.Sprintf("us-state::%s:%s:", strings.ToLower(v.State), strings.ToLower(v.StateInfo.Abbreviation))
+		go s.repo.New(key, v)
 	}
 
 	for _, v := range *history {
@@ -109,12 +99,12 @@ func (s service) UpdateData() (interface{}, error) {
 	return response, nil
 }
 
-//Service
+//Service interface
 type Service interface {
 	UpdateData() (interface{}, error)
 }
 
-//NewService
+//NewService create new service
 func NewService(repo storage.Storage, api covid.Client, list jsons.CountryList, states jsons.States) Service {
 	return service{
 		repo:      repo,

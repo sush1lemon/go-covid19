@@ -18,7 +18,8 @@ type Handler struct {
 	UpSrv updating.Service
 }
 
-// GetCountriesData godoc
+// GetCountriesData get all countries
+// @Tags Worldometer
 // @Summary Get all countries data
 // @Description get current covid data
 // @Produce  json
@@ -43,7 +44,8 @@ func (h Handler) GetCountriesData(c echo.Context) error {
 	return c.JSON(200, &response)
 }
 
-//GetStatesData
+//GetStatesData godoc
+// @Tags Worldometer
 // @Summary Get all US-States data
 // @Description get current US-States covid data
 // @Produce  json
@@ -67,7 +69,8 @@ func (h Handler) GetStatesData(c echo.Context) error {
 	return c.JSON(200, &response)
 }
 
-//FindCountry
+//FindCountry godoc
+// @Tags Worldometer
 // @Summary Find Country
 // @Description find covid19 related data by country
 // @Produce  json
@@ -94,7 +97,7 @@ func (h Handler) FindCountry(c echo.Context) error {
 		}
 	}
 
-	if response.CountryInfo == nil {
+	if response.Country == "" {
 		basicErr.Message = "Cannot find given country"
 		return c.JSON(404, basicErr)
 	}
@@ -102,7 +105,8 @@ func (h Handler) FindCountry(c echo.Context) error {
 	return c.JSON(200, response)
 }
 
-//FindStates
+//FindStates godoc
+// @Tags Worldometer
 // @Summary Find State
 // @Description find covid19 related data by state
 // @Produce  json
@@ -126,14 +130,15 @@ func (h Handler) FindStates(c echo.Context) error {
 		json.Unmarshal([]byte(v), &response)
 	}
 
-	if response.StateInfo == nil {
+	if response.State == "" {
 		return c.JSON(404, basicErr)
 	}
 
 	return c.JSON(200, response)
 }
 
-//GetPHStats
+//GetPHStats godoc
+// @Tags Unavailable
 // @Summary GET DOH PHILIPPINES DATA
 // @Description get doh philippines official data from https://ncovtracker.doh.gov.ph/
 // @Produce  json
@@ -162,7 +167,8 @@ func (h Handler) GetPHStats(c echo.Context) error {
 	return c.JSON(200, response)
 }
 
-//GetPHHospitalPUIs
+//GetPHHospitalPUIs godoc
+// @Tags Unavailable
 // @Summary GET DOH PHILIPPINES DATA (HOSPITAL PUIs)
 // @Description get doh philippines official data (HOSPITAL PUIs) from https://ncovtracker.doh.gov.ph/
 // @Produce  json
@@ -192,6 +198,7 @@ func (h Handler) GetPHHospitalPUIs(c echo.Context) error {
 }
 
 //GetHistories
+// @Tags World Health Organization (WHO)
 // @Summary Get all countries historical data
 // @Description get histories
 // @Produce  json
@@ -203,12 +210,13 @@ func (h Handler) GetHistories(c echo.Context) error {
 		return err
 	}
 
-	var response []who.HistoryData
+	var response []who.SimpleHistoryData
 	for _, v := range *raw {
 		var holder who.HistoryData
 		err := json.Unmarshal([]byte(v), &holder)
 		if err == nil{
-			response = append(response, holder)
+			simple := holder.Simplify()
+			response = append(response, *simple)
 		}
 	}
 
@@ -216,6 +224,7 @@ func (h Handler) GetHistories(c echo.Context) error {
 }
 
 //FindCountryHistories
+// @Tags World Health Organization (WHO)
 // @Summary Find Country Histories
 // @Description find covid19 related historical data by country
 // @Produce  json
@@ -228,6 +237,7 @@ func (h Handler) FindCountryHistories(c echo.Context) error {
 	parameter := strings.ToLower(c.Param("country"))
 
 	var response who.HistoryData
+	var simple *who.SimpleHistoryData
 
 	raw, err := h.R.Find(fmt.Sprintf("history:*:%s:*", parameter))
 	if err != nil {
@@ -236,7 +246,11 @@ func (h Handler) FindCountryHistories(c echo.Context) error {
 	}
 
 	for _, v := range *raw {
-		json.Unmarshal([]byte(v), &response)
+		err := json.Unmarshal([]byte(v), &response)
+		if err != nil {
+			return err
+		}
+		simple = response.Simplify()
 	}
 
 	if response.Country == "" {
@@ -244,10 +258,10 @@ func (h Handler) FindCountryHistories(c echo.Context) error {
 		return c.JSON(404, basicErr)
 	}
 
-	return c.JSON(200, response)
+	return c.JSON(200, &simple)
 }
 
-//UpdateData
+//UpdateData - update
 func (h Handler) UpdateData(c echo.Context) error {
 
 	response, err := h.UpSrv.UpdateData()

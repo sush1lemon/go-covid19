@@ -6,12 +6,11 @@ type service struct {
 	h http.Client
 }
 
-//Service
+//Service interface
 type Service interface {
-
 }
 
-//NewService
+//NewService create new service
 func NewService(h http.Client) Service {
-	return service{h:h}
+	return service{h: h}
 }

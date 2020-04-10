@@ -100,6 +100,7 @@ definitions:
       country:
         type: string
       country_info:
+        $ref: '#/definitions/jsons.Country'
         type: object
       deaths_per_one_million:
         type: number
@@ -120,6 +121,13 @@ definitions:
       total_tests:
         type: integer
     type: object
+  worldometer.StateInfo:
+    properties:
+      abbreviation:
+        type: string
+      name:
+        type: string
+    type: object
   worldometer.StatesStats:
     properties:
       active_cases:
@@ -137,6 +145,7 @@ definitions:
       state:
         type: string
       state_info:
+        $ref: '#/definitions/worldometer.StateInfo'
         type: object
       tests_per_one_million:
         type: number
@@ -173,6 +182,8 @@ paths:
               $ref: '#/definitions/worldometer.CountryStats'
             type: array
       summary: Get all countries data
+      tags:
+      - Worldometer
   /countries/{country}:
     get:
       description: find covid19 related data by country
@@ -194,6 +205,8 @@ paths:
           schema:
             $ref: '#/definitions/rest.BasicError'
       summary: Find Country
+      tags:
+      - Worldometer
   /doh/ph:
     get:
       description: get doh philippines official data from https://ncovtracker.doh.gov.ph/
@@ -207,6 +220,8 @@ paths:
               $ref: '#/definitions/philippines.StatsAttributes'
             type: array
       summary: GET DOH PHILIPPINES DATA
+      tags:
+      - Unavailable
   /doh/ph/hospital-pui:
     get:
       description: get doh philippines official data (HOSPITAL PUIs) from https://ncovtracker.doh.gov.ph/
@@ -220,6 +235,8 @@ paths:
               $ref: '#/definitions/philippines.HsPUIsAttributes'
             type: array
       summary: GET DOH PHILIPPINES DATA (HOSPITAL PUIs)
+      tags:
+      - Unavailable
   /histories:
     get:
       description: get histories
@@ -233,6 +250,8 @@ paths:
               $ref: '#/definitions/who.HistoryData'
             type: array
       summary: Get all countries historical data
+      tags:
+      - World Health Organization (WHO)
   /histories/{country}:
     get:
       description: find covid19 related historical data by country
@@ -254,6 +273,8 @@ paths:
           schema:
             $ref: '#/definitions/rest.BasicError'
       summary: Find Country Histories
+      tags:
+      - World Health Organization (WHO)
   /states:
     get:
       description: get current US-States covid data
@@ -267,6 +288,8 @@ paths:
               $ref: '#/definitions/worldometer.StatesStats'
             type: array
       summary: Get all US-States data
+      tags:
+      - Worldometer
   /states/{state}:
     get:
       description: find covid19 related data by state
@@ -288,6 +311,8 @@ paths:
           schema:
             $ref: '#/definitions/rest.BasicError'
       summary: Find State
+      tags:
+      - Worldometer
 schemes:
 - https
 swagger: "2.0"

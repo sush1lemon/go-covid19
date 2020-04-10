@@ -12,13 +12,13 @@ type service struct {
 	h http.Client
 }
 
-//Service
+//Service interface
 type Service interface {
 	GetStats() (*StatsAttributes, error)
 	GetHospitalPUI() (*[]HsPUIsAttributes, error)
 }
 
-//GetStats
+//GetStats get ph data
 func (s service) GetStats() (*StatsAttributes, error) {
 
 	param := phParams{
@@ -56,7 +56,7 @@ func (s service) GetStats() (*StatsAttributes, error) {
 	return &response, nil
 }
 
-//GetHospitalPUI
+//GetHospitalPUI get hospital with puis
 func (s service) GetHospitalPUI() (*[]HsPUIsAttributes, error) {
 	param := phParams{
 		F:              "json",
@@ -93,7 +93,7 @@ func (s service) GetHospitalPUI() (*[]HsPUIsAttributes, error) {
 	return &response, nil
 }
 
-//NewService
+//NewService create new service
 func NewService(h http.Client) Service {
 	return &service{h: h}
 }

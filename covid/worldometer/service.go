@@ -4,26 +4,32 @@ import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/jezerdave/go-covid19/covid/util"
+	"github.com/jezerdave/go-covid19/covid/util/jsons"
 	"net/http"
+	"strings"
 )
 
 // Service struct
 type service struct {
-	h http.Client
+	h         http.Client
+	countries jsons.CountryList
+	states    jsons.States
 }
 
-//Service
+//Service interface
 type Service interface {
 	GetCountriesData() (*[]CountryStats, error)
 	GetStatesData() (*[]StatesStats, error)
+	FindCountry(string) (*CountryStats, error)
+	FindState(string) (*StatesStats, error)
 }
 
-//NewService
-func NewService(h http.Client) Service {
-	return service{h: h}
+//NewService create new service
+func NewService(h http.Client, countries jsons.CountryList, states jsons.States) Service {
+	return service{h, countries, states}
 }
 
-//GetCountriesData
+//GetCountriesData get all countries data
 func (s service) GetCountriesData() (*[]CountryStats, error) {
 
 	res, err := s.h.Get(countriesApi)
@@ -75,14 +81,22 @@ func (s service) GetCountriesData() (*[]CountryStats, error) {
 			}
 		})
 		if holder.Country != "" {
-			data = append(data, holder)
+
+			for _, v := range s.countries.Countries {
+				if strings.EqualFold(holder.Country, v.Name.Common) || strings.EqualFold(holder.Country, v.Name.Official) ||
+					strings.EqualFold(holder.Country, v.Cca3) || strings.EqualFold(holder.Country, v.Cca2) ||
+					strings.EqualFold(holder.Country, v.Ccn3) {
+					holder.CountryInfo = v
+					data = append(data, holder)
+				}
+			}
 		}
 	})
 
 	return &data, nil
 }
 
-//GetStatesData
+//GetStatesData get all states data
 func (s service) GetStatesData() (*[]StatesStats, error) {
 	res, err := s.h.Get(statesApi)
 	if err != nil {
@@ -133,10 +147,53 @@ func (s service) GetStatesData() (*[]StatesStats, error) {
 				holder.TestsPerOneMillion = formatToFloat(sTD.Text())
 			}
 		})
+
 		if holder.State != "" && !util.InArray(holder.State, exception) {
-			data = append(data, holder)
+			for i, v := range s.states.States {
+				if strings.EqualFold(holder.State, v) {
+					holder.StateInfo = StateInfo{
+						Name:         v,
+						Abbreviation: i,
+					}
+					data = append(data, holder)
+				}
+			}
 		}
 	})
 
 	return &data, nil
+}
+
+//FindCountry get country by given string
+func (s service) FindCountry(param string) (*CountryStats, error) {
+	list, err := s.GetCountriesData()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, v := range *list {
+		if strings.EqualFold(param, v.CountryInfo.Name.Common) || strings.EqualFold(param, v.CountryInfo.Name.Official) ||
+			strings.EqualFold(param, v.CountryInfo.Cca3) || strings.EqualFold(param, v.CountryInfo.Cca2) ||
+			strings.EqualFold(param, v.CountryInfo.Ccn3) {
+			return &v, nil
+		}
+	}
+
+	return nil, nil
+}
+
+//FindState get state by given string
+func (s service) FindState(param string) (*StatesStats, error) {
+	list, err := s.GetStatesData()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, v := range *list {
+		if strings.EqualFold(v.StateInfo.Name, param) || strings.EqualFold(v.State, param) {
+			return &v, nil
+		}
+	}
+
+	return nil, nil
 }

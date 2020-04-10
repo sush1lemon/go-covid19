@@ -2,7 +2,7 @@ package util
 
 import "reflect"
 
-//InArray
+//InArray check if in array
 func InArray(val interface{}, array interface{}) (exists bool) {
 	exists = false
 	//index = -1
